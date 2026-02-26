@@ -1,0 +1,101 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    restart: unless-stopped
+    init: true
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prom_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      # 1GB용: 오래 보관하지 말고 가볍게 (기본 3일)
+      - "--storage.tsdb.retention.time=${RETENTION_TIME:-3d}"
+      # 1GB용: 무거운 쿼리 제한
+      - "--query.max-concurrency=4"
+      - "--query.timeout=30s"
+    mem_limit: 520m
+    cpus: 0.55
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/ready"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: grafana
+    restart: unless-stopped
+    init: true
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-change-me}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    mem_limit: 360m
+    cpus: 0.25
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 모니터링 VM(자기 자신) 리소스 수집용
+  node_exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node_exporter
+    restart: unless-stopped
+    init: true
+    ports:
+      - "9100:9100"
+    mem_limit: 60m
+    cpus: 0.10
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # Oracle DB exporter는 "옵션"으로 두는 게 1GB에서 안전함
+  # 실제로 사용할 때만 profile로 켜기: docker compose --profile oracle up -d
+  oracle_db_metrics_exporter:
+    image: container-registry.oracle.com/observability/oracle-db-metrics-exporter:latest
+    container_name: oracle_db_metrics_exporter
+    restart: unless-stopped
+    init: true
+    profiles: ["oracle"]
+    ports:
+      - "9161:9161"
+    # ⚠️ 여기 환경변수/설정은 Oracle exporter 문서 스펙대로 채워야 함
+    # environment:
+    #   - ...
+    mem_limit: 140m
+    cpus: 0.15
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+volumes:
+  prom_data:
+  grafana_data:

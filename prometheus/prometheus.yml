@@ -9,11 +9,11 @@ scrape_configs:
     scheme: http
     metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets: ["140.245.201.97:8080"]
+      - targets: ["10.0.0.246:8080"]
         labels:
           env: "main"
           vm: "main-vm"
-      - targets: ["140.245.200.31:8080"]
+      - targets: ["10.0.0.108:8080"]
         labels:
           env: "dev"
           vm: "dev-vm"

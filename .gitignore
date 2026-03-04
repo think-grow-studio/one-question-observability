@@ -1,4 +1,4 @@
-.env
+.env*
 *.log
 prometheus/data/
 grafana/data/

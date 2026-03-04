@@ -1,0 +1,10 @@
+groups:
+  - name: basic
+    rules:
+      - alert: TargetDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Target down: job={{ $labels.job }}, instance={{ $labels.instance }}, env={{ $labels.env }}"

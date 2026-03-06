@@ -4865,7 +4865,7 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(up{job=\"one-question-api\"},$application)",
+        "definition": "label_values(up{job=\"one-question-api\"},application)",
         "hide": 0,
         "includeAll": true,
         "label": "Application",
@@ -4874,7 +4874,7 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(up{job=\"one-question-api\"},$application)",
+          "query": "label_values(up{job=\"one-question-api\"},application)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
@@ -5009,8 +5009,8 @@
     ]
   },
   "time": {
-    "from": "2026-03-04T11:41:29.718Z",
-    "to": "2026-03-05T02:28:53.718Z"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {
     "now": true,

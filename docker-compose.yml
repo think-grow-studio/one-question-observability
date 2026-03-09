@@ -76,18 +76,19 @@ services:
         max-size: "5m"
         max-file: "2"
 
-  # Oracle DB exporter (main)
-  # 사용법: docker compose --profile oracle up -d
+  # Oracle DB exporter (main) - Autonomous DB Wallet 지원
   # 사전준비: oracle/wallet/main/ 에 Wallet zip 풀어놓기
   oracle_exporter_main:
-    image: iamseth/oracledb_exporter:0.2.9-alpine
+    image: container-registry.oracle.com/database/observability-exporter:2.2.2
     container_name: oracle_exporter_main
     restart: unless-stopped
     init: true
     ports:
       - "9161:9161"
     environment:
-      - DATA_SOURCE_NAME=${ORACLE_MAIN_DSN}
+      - DB_USERNAME=${ORACLE_MAIN_USER}
+      - DB_PASSWORD=${ORACLE_MAIN_PASSWORD}
+      - DB_CONNECT_STRING=${ORACLE_MAIN_TNS}
       - TNS_ADMIN=/wallet
     volumes:
       - ./oracle/wallet/main:/wallet:ro

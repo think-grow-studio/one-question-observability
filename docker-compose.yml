@@ -99,6 +99,29 @@ services:
         max-size: "5m"
         max-file: "2"
 
+  # Oracle DB exporter (dev) - Autonomous DB Wallet 지원
+  # 사전준비: oracle/wallet/dev/ 에 Wallet zip 풀어놓기
+  oracle_exporter_dev:
+    image: container-registry.oracle.com/database/observability-exporter:2.2.2
+    container_name: oracle_exporter_dev
+    restart: unless-stopped
+    init: true
+    ports:
+      - "9162:9161"
+    environment:
+      - DB_USERNAME=${ORACLE_DEV_USER}
+      - DB_PASSWORD=${ORACLE_DEV_PASSWORD}
+      - DB_CONNECT_STRING=${ORACLE_DEV_TNS}
+      - TNS_ADMIN=/wallet
+    volumes:
+      - ./oracle/wallet/dev:/wallet:ro
+    mem_limit: 64m
+    cpus: 0.10
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "2"
+
 volumes:
   prom_data:
   grafana_data:

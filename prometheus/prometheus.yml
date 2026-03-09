@@ -24,3 +24,7 @@ scrape_configs:
         labels:
           env: "main"
           component: "oracle"
+      - targets: ["oracle_exporter_dev:9161"]
+        labels:
+          env: "dev"
+          component: "oracle"

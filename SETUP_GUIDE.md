@@ -6,7 +6,9 @@
 
 ```
 GRAFANA_ADMIN_PASSWORD=새비밀번호
-ORACLE_MAIN_DSN=oracle://유저:비밀번호@호스트:1522/서비스명?wallet=/wallet
+ORACLE_MAIN_USER=유저명
+ORACLE_MAIN_PASSWORD=비밀번호
+ORACLE_MAIN_TNS=main_high
 ```
 
 ### 2. `prometheus/prometheus.yml`
@@ -35,6 +37,12 @@ OCI 콘솔에서 Wallet zip 다운로드 후:
 unzip Wallet_xxx.zip -d oracle/wallet/main/
 ```
 
+sqlnet.ora의 WALLET_LOCATION 경로를 컨테이너 마운트 경로로 변경:
+
+```bash
+sed -i 's|?/network/admin|/wallet|g' oracle/wallet/main/sqlnet.ora
+```
+
 Wallet은 git에 포함되지 않으므로 VM에 직접 전송:
 
 ```bash
@@ -44,11 +52,7 @@ scp -i <SSH_KEY> -r oracle/wallet/main/* user@VM_IP:~/observability/oracle/walle
 ## 실행
 
 ```bash
-# Oracle 모니터링 없이
 docker compose --env-file .env.prod up -d
-
-# Oracle 모니터링 포함
-docker compose --env-file .env.prod --profile oracle up -d
 ```
 
 ## 확인

@@ -18,11 +18,9 @@ scrape_configs:
           env: "dev"
           vm: "dev-vm"
 
-  # (틀만) Oracle exporter 스크랩 자리
-  # oracle exporter를 켰을 때만 targets를 채우면 됨
   - job_name: "oracle-db"
     static_configs:
-      - targets: ["127.0.0.1:9161"]
+      - targets: ["oracle_exporter_main:9161"]
         labels:
           env: "main"
           component: "oracle"

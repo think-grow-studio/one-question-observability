@@ -19,8 +19,8 @@ services:
       # 1GB용: 무거운 쿼리 제한
       - "--query.max-concurrency=4"
       - "--query.timeout=30s"
-    mem_limit: 520m
-    cpus: 0.55
+    mem_limit: 450m
+    cpus: 0.50
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/ready"]
       interval: 15s
@@ -49,7 +49,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
-    mem_limit: 360m
+    mem_limit: 300m
     cpus: 0.25
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
@@ -69,28 +69,31 @@ services:
     init: true
     ports:
       - "9100:9100"
-    mem_limit: 60m
-    cpus: 0.10
+    mem_limit: 50m
+    cpus: 0.08
     logging:
       options:
         max-size: "5m"
         max-file: "2"
 
-  # Oracle DB exporter는 "옵션"으로 두는 게 1GB에서 안전함
-  # 실제로 사용할 때만 profile로 켜기: docker compose --profile oracle up -d
-  oracle_db_metrics_exporter:
-    image: container-registry.oracle.com/observability/oracle-db-metrics-exporter:latest
-    container_name: oracle_db_metrics_exporter
+  # Oracle DB exporter (main)
+  # 사용법: docker compose --profile oracle up -d
+  # 사전준비: oracle/wallet/main/ 에 Wallet zip 풀어놓기
+  oracle_exporter_main:
+    image: iamseth/oracledb_exporter:0.6.0
+    container_name: oracle_exporter_main
     restart: unless-stopped
     init: true
     profiles: ["oracle"]
     ports:
       - "9161:9161"
-    # ⚠️ 여기 환경변수/설정은 Oracle exporter 문서 스펙대로 채워야 함
-    # environment:
-    #   - ...
-    mem_limit: 140m
-    cpus: 0.15
+    environment:
+      - DATA_SOURCE_NAME=${ORACLE_MAIN_DSN}
+      - TNS_ADMIN=/wallet
+    volumes:
+      - ./oracle/wallet/main:/wallet:ro
+    mem_limit: 64m
+    cpus: 0.10
     logging:
       options:
         max-size: "5m"

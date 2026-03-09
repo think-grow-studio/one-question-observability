@@ -2,3 +2,4 @@
 *.log
 prometheus/data/
 grafana/data/
+oracle/wallet/

@@ -8,3 +8,29 @@ groups:
           severity: critical
         annotations:
           summary: "Target down: job={{ $labels.job }}, instance={{ $labels.instance }}, env={{ $labels.env }}"
+
+  - name: oracle
+    rules:
+      - alert: OracleDBDown
+        expr: oracledb_up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Oracle DB unreachable: {{ $labels.instance }}"
+
+      - alert: OracleTablespaceUsageHigh
+        expr: oracledb_tablespace_used_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tablespace {{ $labels.tablespace }} usage {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: OracleSessionsHigh
+        expr: oracledb_sessions_value > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Active sessions {{ $value }} on {{ $labels.instance }}"

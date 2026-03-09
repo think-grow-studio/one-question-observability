@@ -80,7 +80,7 @@ services:
   # 사용법: docker compose --profile oracle up -d
   # 사전준비: oracle/wallet/main/ 에 Wallet zip 풀어놓기
   oracle_exporter_main:
-    image: iamseth/oracledb_exporter:0.6.0
+    image: iamseth/oracledb_exporter:0.2.9-alpine
     container_name: oracle_exporter_main
     restart: unless-stopped
     init: true

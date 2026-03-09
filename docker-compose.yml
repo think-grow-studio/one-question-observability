@@ -84,7 +84,6 @@ services:
     container_name: oracle_exporter_main
     restart: unless-stopped
     init: true
-    profiles: ["oracle"]
     ports:
       - "9161:9161"
     environment:

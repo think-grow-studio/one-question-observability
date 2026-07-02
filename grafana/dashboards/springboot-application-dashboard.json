@@ -613,14 +613,38 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(\n  sum(rate(http_server_requests_seconds_count{status=~\"5..\", instance=~\"$instance\"}[5m]))\n)\n/\n(\n  sum(rate(http_server_requests_seconds_count{instance=~\"$instance\"}[5m]))\n)",
+          "expr": "(\n  sum(rate(http_server_requests_seconds_count{status=~\"[45]..\", instance=~\"$instance\"}[5m]))\n)\n/\n(\n  sum(rate(http_server_requests_seconds_count{instance=~\"$instance\"}[5m]))\n)",
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "Total Error Rate (4xx+5xx)",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(\n  sum(rate(http_server_requests_seconds_count{status=~\"4..\", instance=~\"$instance\"}[5m]))\n)\n/\n(\n  sum(rate(http_server_requests_seconds_count{instance=~\"$instance\"}[5m]))\n)",
+          "instant": false,
+          "legendFormat": "4xx Rate",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(\n  sum(rate(http_server_requests_seconds_count{status=~\"5..\", instance=~\"$instance\"}[5m]))\n)\n/\n(\n  sum(rate(http_server_requests_seconds_count{instance=~\"$instance\"}[5m]))\n)",
+          "instant": false,
+          "legendFormat": "5xx Rate",
+          "range": true,
+          "refId": "C"
         }
       ],
-      "title": "Error Rate",
+      "title": "Error Rate (4xx + 5xx)",
       "type": "timeseries"
     },
     {
@@ -1929,6 +1953,21 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HTTP - 4xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#f2cc0c",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1966,9 +2005,223 @@
           "legendFormat": "HTTP - 5xx",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(http_server_requests_seconds_count{application=~\"$application\", instance=~\"$instance\", status=~\"4..\"}[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "HTTP - 4xx",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "Errors",
+      "title": "Errors (4xx + 5xx)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 71
+      },
+      "id": 200,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (status)(rate(http_server_requests_seconds_count{application=~\"$application\", instance=~\"$instance\", status=~\"[45]..\"}[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{status}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Errors by Status Code",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 71
+      },
+      "id": 201,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (exception)(rate(http_server_requests_seconds_count{application=~\"$application\", instance=~\"$instance\", status=~\"[45]..\", exception!=\"none\", exception!=\"\"}[1m]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{exception}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Errors by Exception Class",
+      "description": "exception label이 Spring Boot 앱에서 수집되고 있어야 동작합니다. No data가 표시되면 앱의 메트릭 설정을 확인하세요.",
       "type": "timeseries"
     },
     {

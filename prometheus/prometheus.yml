@@ -9,14 +9,14 @@ scrape_configs:
     scheme: http
     metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets: ["10.0.0.246:8080"]
+      - targets: ["10.0.0.87:8081"]
         labels:
           env: "main"
           vm: "main-vm"
-      - targets: ["10.0.0.108:8080"]
+      - targets: ["10.0.0.31:8081"]
         labels:
-          env: "dev"
-          vm: "dev-vm"
+          env: "sub"
+          vm: "sub-vm"
 
   - job_name: "oracle-db"
     static_configs:
